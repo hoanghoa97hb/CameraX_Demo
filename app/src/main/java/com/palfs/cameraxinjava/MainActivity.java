@@ -45,7 +45,8 @@ import java.util.concurrent.Executor;
 
 public class MainActivity extends AppCompatActivity implements ImageAnalysis.Analyzer, View.OnClickListener {
     private ListenableFuture<ProcessCameraProvider> cameraProviderFuture;
-
+    private static final String[] CAMERA_PERMISSION = new String[]{Manifest.permission.CAMERA};
+    private static final int CAMERA_REQUEST_CODE = 10;
     PreviewView previewView;
     private ImageCapture imageCapture;
     private VideoCapture videoCapture;
@@ -61,10 +62,12 @@ public class MainActivity extends AppCompatActivity implements ImageAnalysis.Ana
         bCapture = findViewById(R.id.bCapture);
         bRecord = findViewById(R.id.bRecord);
         bRecord.setText("start recording"); // Set the initial text of the button
-        
+
         bCapture.setOnClickListener(this);
         bRecord.setOnClickListener(this);
-
+        if (!hasCameraPermission()) {
+            requestPermission();
+        }
         cameraProviderFuture = ProcessCameraProvider.getInstance(this);
         cameraProviderFuture.addListener(() -> {
             try {
@@ -127,7 +130,7 @@ public class MainActivity extends AppCompatActivity implements ImageAnalysis.Ana
                 capturePhoto();
                 break;
             case R.id.bRecord:
-                if (bRecord.getText() == "start recording"){
+                if (bRecord.getText() == "start recording") {
                     bRecord.setText("stop recording");
                     recordVideo();
                 } else {
@@ -139,12 +142,25 @@ public class MainActivity extends AppCompatActivity implements ImageAnalysis.Ana
         }
     }
 
+    private boolean hasCameraPermission() {
+        return ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.CAMERA
+        ) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    private void requestPermission() {
+        ActivityCompat.requestPermissions(
+                this,
+                CAMERA_PERMISSION,
+                CAMERA_REQUEST_CODE
+        );
+    }
+
     @SuppressLint("RestrictedApi")
     private void recordVideo() {
         if (videoCapture != null) {
-
             long timestamp = System.currentTimeMillis();
-
             ContentValues contentValues = new ContentValues();
             contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, timestamp);
             contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "video/mp4");
@@ -158,7 +174,6 @@ public class MainActivity extends AppCompatActivity implements ImageAnalysis.Ana
                     //                                          int[] grantResults)
                     // to handle the case where the user grants the permission. See the documentation
                     // for ActivityCompat#requestPermissions for more details.
-                    return;
                 }
                 videoCapture.startRecording(
                         new VideoCapture.OutputFileOptions.Builder(
