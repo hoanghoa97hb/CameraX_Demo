@@ -10,7 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
-import android.util.Size;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity implements ImageAnalysis.Ana
     private static final int CAMERA_PERMISSION_CODE = 10;
     private ListenableFuture<ProcessCameraProvider> cameraProviderFuture;
     private static final String[] CAMERA_PERMISSION = new String[]{Manifest.permission.CAMERA
-            ,Manifest.permission.RECORD_AUDIO,Manifest.permission.WRITE_EXTERNAL_STORAGE};
+            , Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE};
     private static final int CAMERA_REQUEST_CODE = 10;
     PreviewView previewView;
     private ImageCapture imageCapture;
@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements ImageAnalysis.Ana
         bRecord.setOnClickListener(this);
         if (!hasCameraPermission()) {
             requestPermission();
-        }else {
+        } else {
             cameraProviderFuture = ProcessCameraProvider.getInstance(this);
             cameraProviderFuture.addListener(() -> {
                 try {
@@ -185,8 +185,7 @@ public class MainActivity extends AppCompatActivity implements ImageAnalysis.Ana
                 }, getExecutor());
                 // Showing the toast message
                 Toast.makeText(MainActivity.this, "Camera Permission Granted", Toast.LENGTH_SHORT).show();
-            }
-            else {
+            } else {
                 Toast.makeText(MainActivity.this, "Camera Permission Denied", Toast.LENGTH_SHORT).show();
             }
         }
@@ -211,25 +210,25 @@ public class MainActivity extends AppCompatActivity implements ImageAnalysis.Ana
                     // for ActivityCompat#requestPermissions for more details.
                     return;
                 }
-                    videoCapture.startRecording(
-                            new VideoCapture.OutputFileOptions.Builder(
-                                    getContentResolver(),
-                                    MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
-                                    contentValues
-                            ).build(),
-                            getExecutor(),
-                            new VideoCapture.OnVideoSavedCallback() {
-                                @Override
-                                public void onVideoSaved(@NonNull VideoCapture.OutputFileResults outputFileResults) {
-                                    Toast.makeText(MainActivity.this, "Video has been saved successfully.", Toast.LENGTH_SHORT).show();
-                                }
-
-                                @Override
-                                public void onError(int videoCaptureError, @NonNull String message, @Nullable Throwable cause) {
-                                    Toast.makeText(MainActivity.this, "Error saving video: " + message, Toast.LENGTH_SHORT).show();
-                                }
+                videoCapture.startRecording(
+                        new VideoCapture.OutputFileOptions.Builder(
+                                getContentResolver(),
+                                MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+                                contentValues
+                        ).build(),
+                        getExecutor(),
+                        new VideoCapture.OnVideoSavedCallback() {
+                            @Override
+                            public void onVideoSaved(@NonNull VideoCapture.OutputFileResults outputFileResults) {
+                                Toast.makeText(MainActivity.this, "Video has been saved successfully.", Toast.LENGTH_SHORT).show();
                             }
-                    );
+
+                            @Override
+                            public void onError(int videoCaptureError, @NonNull String message, @Nullable Throwable cause) {
+                                Toast.makeText(MainActivity.this, "Error saving video: " + message, Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                );
             } catch (Exception e) {
                 e.printStackTrace();
             }
